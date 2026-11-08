@@ -39,8 +39,8 @@ São duas peças gratuitas:
    - **anon public key** → `VITE_SUPABASE_ANON_KEY`
    (essa chave é pública por natureza; quem protege seus dados são as regras RLS do schema.)
 4. Para testar local com a nuvem: copie `.env.example` para `.env`, preencha os dois valores e rode `npm run dev`.
-5. Abra o app, clique em **Criar conta** e confirme o e-mail.
-6. **Importante:** depois de criar sua conta, vá em **Authentication → Sign In / Providers** e desligue **Allow new users to sign up**. Assim ninguém mais consegue criar conta no seu app.
+5. Crie sua conta pelo painel: **Authentication → Users → Add user** (e-mail + senha, marque "Auto Confirm"). O app não tem botão de cadastro, de propósito.
+6. **Importante:** em **Authentication → Sign In / Providers**, deixe **Allow new users to sign up** desligado. Assim ninguém mais consegue criar conta no seu app.
 
 > No projeto Free, o Supabase pausa projetos sem nenhum acesso por 7 dias. Basta entrar no painel e clicar em "Restore" — os dados não se perdem. Usando o app com frequência, isso não acontece.
 

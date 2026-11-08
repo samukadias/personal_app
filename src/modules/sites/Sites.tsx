@@ -13,7 +13,11 @@ const SUGESTOES = ['Trabalho', 'Ferramentas', 'Estudo', 'Notícias', 'Compras', 
 export const normUrl = (u: string) => {
   const t = u.trim()
   if (!t) return t
-  return /^[a-z][a-z0-9+.-]*:\/\//i.test(t) ? t : `https://${t}`
+  return /^https?:\/\//i.test(t) ? t : `https://${t.replace(/^[a-z][a-z0-9+.-]*:\/\//i, '')}`
+}
+/** só deixa abrir links http/https (bloqueia javascript:, data: etc.) */
+const linkSeguro = (u: string) => {
+  try { const x = new URL(normUrl(u)); return x.protocol === 'https:' || x.protocol === 'http:' ? x.href : undefined } catch { return undefined }
 }
 export const dominio = (u: string) => {
   try { return new URL(normUrl(u)).hostname.replace(/^www\./, '') } catch { return u }
@@ -50,7 +54,7 @@ export default function Sites() {
 
   const card = (r: Rec<Site>) => (
     <li key={r.id} className="site-card">
-      <a className="site-main" href={normUrl(r.data.url)} target="_blank" rel="noopener noreferrer">
+      <a className="site-main" href={linkSeguro(r.data.url)} target="_blank" rel="noopener noreferrer">
         <LetterBadge text={r.data.nome} />
         <span className="site-text">
           <strong>{r.data.nome}</strong>
