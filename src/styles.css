@@ -227,13 +227,17 @@ code { font-family: var(--mono); font-size: .9em; }
 
 /* ---------- modal ---------- */
 .modal-backdrop {
-  position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 16px;
+  /* ancorada no topo (com respiro), e não no centro: barras do navegador
+     por cima da página não escondem mais o título da janela */
+  position: fixed; inset: 0; z-index: 50; display: flex; align-items: flex-start; justify-content: center;
+  padding: clamp(16px, 8vh, 72px) 16px 16px; overflow-y: auto;
   background: rgba(20, 16, 12, .45); animation: fade .15s ease;
 }
 @keyframes fade { from { opacity: 0; } }
 .modal {
   --tone: var(--mustard);
-  width: min(560px, 100%); max-height: calc(100vh - 32px); display: flex; flex-direction: column;
+  width: min(560px, 100%); max-height: calc(100vh - clamp(16px, 8vh, 72px) - 16px);
+  max-height: calc(100dvh - clamp(16px, 8vh, 72px) - 16px); display: flex; flex-direction: column; flex-shrink: 0;
   background: var(--card); border: var(--bw) solid var(--line); border-radius: 18px; box-shadow: var(--shadow-lg);
   animation: pop .2s cubic-bezier(.3, 1.4, .5, 1);
   overflow: hidden;
@@ -445,8 +449,8 @@ code { font-family: var(--mono); font-size: .9em; }
   .pw-row .row-actions { order: 4; width: 100%; justify-content: flex-end; }
   .search-big input { font-size: 1rem; }
   .toasts { bottom: 96px; }
-  .modal-backdrop { align-items: end; padding: 0; }
-  .modal { width: 100%; border-radius: 20px 20px 0 0; max-height: 92vh; }
+  .modal-backdrop { align-items: flex-end; padding: 0; }
+  .modal { width: 100%; border-radius: 20px 20px 0 0; max-height: 92vh; max-height: 92dvh; }
 }
 @media (max-width: 380px) {
   .mod-cards, .box-grid { grid-template-columns: 1fr; }
