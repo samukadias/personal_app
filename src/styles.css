@@ -327,8 +327,32 @@ code { font-family: var(--mono); font-size: .9em; }
 .box-icon { font-size: 28px; margin-bottom: auto; }
 .box-open strong { font-size: 1.08rem; letter-spacing: -.01em; line-height: 1.2; margin-top: 10px; }
 .box-count { font-family: var(--hand); font-size: 1.2rem; color: var(--muted); line-height: 1; }
+.box-count { display: flex; flex-direction: column; gap: 2px; }
+.box-units { font-family: var(--mono); font-size: .72rem; font-weight: 600; letter-spacing: .02em; text-transform: uppercase; color: var(--ink); }
+.here-info .box-count { margin-top: 6px; flex-direction: row; align-items: baseline; gap: 10px; }
 .box-tools { position: absolute; top: 20px; right: 6px; display: flex; opacity: 0; transition: opacity .15s; }
 .box-card:hover .box-tools, .box-card:focus-within .box-tools { opacity: 1; }
+
+/* arrastar e soltar */
+.box-card, .thing { touch-action: manipulation; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+.box-card[data-dragging], .thing[data-dragging] { opacity: .35; }
+.box-card[data-over] { transform: rotate(0) scale(1.05); }
+.box-card[data-over] .box-open { background: var(--mustard); box-shadow: var(--shadow-lg); }
+.crumbs button[data-over], .drop-out[data-over] { background: var(--mustard); color: var(--ink); outline: 2px solid var(--line); }
+.drag-tip { margin: -6px 0 12px; font-family: var(--hand); font-size: 1.05rem; color: var(--muted); }
+.drag-ghost {
+  position: fixed; z-index: 60; pointer-events: none; transform: translate(-50%, -130%) rotate(-3deg);
+  display: flex; flex-direction: column; padding: 8px 14px; border: 2px solid var(--line); border-radius: 12px;
+  background: var(--card); box-shadow: var(--shadow-lg); font-weight: 700; white-space: nowrap;
+}
+.drag-ghost span { font-family: var(--hand); font-weight: 400; font-size: 1.1rem; color: var(--muted); }
+.drag-ghost.ok { background: var(--mustard); }
+.drag-ghost.ok span { color: var(--ink); }
+.drop-out {
+  position: fixed; z-index: 55; top: 14px; left: 50%; transform: translateX(-50%); max-width: calc(100vw - 32px);
+  padding: 14px 22px; border: 2px dashed var(--line); border-radius: 14px; background: var(--card); box-shadow: var(--shadow);
+  font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; animation: pop .15s ease;
+}
 
 .thing-list, .found-list, .pw-list, .site-grid { list-style: none; margin: 0; padding: 0; }
 .thing-list { display: flex; flex-direction: column; gap: 10px; }

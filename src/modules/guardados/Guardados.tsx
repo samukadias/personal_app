@@ -5,6 +5,7 @@ import { go } from '../../lib/router'
 import { byName, matches } from '../../lib/text'
 import { Button, Empty, Field, IconButton, Modal, useToast } from '../../components/ui'
 import { IconBack, IconBox, IconEdit, IconPlus, IconSearch, IconTrash } from '../../components/icons'
+import { useArrastar } from './useArrastar'
 
 /** Uma "coisa" pode ser um item ou um recipiente (caixa, bolsa, gaveta, armário...) */
 export type Coisa = {
@@ -41,7 +42,31 @@ export default function Guardados({ params }: { params: string[] }) {
     return out
   }
   const filhosDe = (id: string | null) => items.filter((r) => (r.data.paiId ?? null) === id)
-  const totalDentro = (id: string): number => filhosDe(id).reduce((n, r) => n + 1 + (r.data.recipiente ? totalDentro(r.id) : 0), 0)
+  /** quantas coisas (registros) e quantas unidades (somando a quantidade de cada item) tem dentro, em todos os níveis */
+  const contagem = (id: string): { coisas: number; unidades: number } =>
+    filhosDe(id).reduce((acc, r) => {
+      if (!r.data.recipiente) return { coisas: acc.coisas + 1, unidades: acc.unidades + Math.max(1, r.data.qtd ?? 1) }
+      const sub = contagem(r.id)
+      return { coisas: acc.coisas + 1 + sub.coisas, unidades: acc.unidades + sub.unidades }
+    }, { coisas: 0, unidades: 0 })
+  const dentroDe = (id: string, ancestral: string) => caminho(id).some((p) => p.id === ancestral)
+
+  const { arrasto, arrastavel, soltavel } = useArrastar(
+    (id, alvo) => {
+      const r = byId.get(id)
+      if (!r) return false
+      if (alvo === 'root') return r.data.paiId != null
+      const destino = byId.get(alvo)
+      return !!destino?.data.recipiente && alvo !== r.data.paiId && !dentroDe(alvo, id)
+    },
+    async (id, alvo) => {
+      const r = byId.get(id)
+      if (!r) return
+      const paiId = alvo === 'root' ? null : alvo
+      await save({ ...r.data, paiId }, id)
+      toast(paiId ? `${r.data.nome} → ${byId.get(paiId)?.data.nome} ✔` : `${r.data.nome} → nível principal ✔`)
+    },
+  )
 
   const atual = atualId ? byId.get(atualId) : undefined
   const trilha = caminho(atualId)
@@ -117,10 +142,10 @@ export default function Guardados({ params }: { params: string[] }) {
       ) : (
         <>
           <nav className="crumbs" aria-label="Caminho">
-            <button className={!atualId ? 'on' : ''} onClick={() => go('cade')}>🏠 Tudo</button>
+            <button className={!atualId ? 'on' : ''} onClick={() => go('cade')} {...soltavel('root')}>🏠 Tudo</button>
             {trilha.map((t) => (
               <span key={t.id} className="crumb-wrap"><span className="crumb-sep">/</span>
-                <button className={t.id === atualId ? 'on' : ''} onClick={() => go('cade', t.id)}>{t.data.icone || '📦'} {t.data.nome}</button>
+                <button className={t.id === atualId ? 'on' : ''} onClick={() => go('cade', t.id)} {...soltavel(t.id)}>{t.data.icone || '📦'} {t.data.nome}</button>
               </span>
             ))}
           </nav>
@@ -132,6 +157,7 @@ export default function Guardados({ params }: { params: string[] }) {
               <div className="here-info">
                 <h2>{atual.data.icone || '📦'} {atual.data.nome}</h2>
                 {atual.data.notas && <p>{atual.data.notas}</p>}
+                <Contagem {...contagem(atual.id)} />
               </div>
               <div className="row-actions">
                 <IconButton label="Editar" onClick={() => setEditing({ rec: atual, recipiente: true })}><IconEdit /></IconButton>
@@ -155,16 +181,18 @@ export default function Guardados({ params }: { params: string[] }) {
               {recipientes.length > 0 && (
                 <section>
                   <h2 className="section-title">{atual ? 'Recipientes aqui dentro' : 'Lugares & caixas'}</h2>
+                  <p className="drag-tip">dica: arraste uma caixa ou coisa pra dentro de outra caixa{atual ? ', ou pro caminho lá em cima pra tirar daqui' : ''}. No celular, segure um instante antes de arrastar.</p>
                   <div className="box-grid">
                     {recipientes.map((r, i) => (
-                      <div key={r.id} className="box-card" style={{ ['--box' as string]: r.data.cor || 'var(--ink)', ['--tilt' as string]: `${(i % 3) - 1}deg` }}>
+                      <div key={r.id} className="box-card" style={{ ['--box' as string]: r.data.cor || 'var(--ink)', ['--tilt' as string]: `${(i % 3) - 1}deg` }}
+                        {...arrastavel(r.id, `${r.data.icone || '📦'} ${r.data.nome}`)} {...soltavel(r.id)}>
                         <button className="box-open" onClick={() => go('cade', r.id)}>
                           <span className="box-lid" />
                           <span className="box-icon">{r.data.icone || '📦'}</span>
                           <strong>{r.data.nome}</strong>
-                          <span className="box-count">{totalDentro(r.id) || 'vazio'}{totalDentro(r.id) ? ' coisa(s)' : ''}</span>
+                          <Contagem {...contagem(r.id)} />
                         </button>
-                        <div className="box-tools">
+                        <div className="box-tools no-drag">
                           <IconButton label="Editar" onClick={() => setEditing({ rec: r, recipiente: true })}><IconEdit /></IconButton>
                           <IconButton label="Apagar" onClick={() => apagar(r)}><IconTrash /></IconButton>
                         </div>
@@ -178,14 +206,14 @@ export default function Guardados({ params }: { params: string[] }) {
                   <h2 className="section-title">{atual ? 'Coisas aqui dentro' : 'Coisas soltas'}</h2>
                   <ul className="thing-list">
                     {soltos.map((r) => (
-                      <li key={r.id} className="thing">
+                      <li key={r.id} className="thing" {...arrastavel(r.id, `${r.data.icone || '•'} ${r.data.nome}`)}>
                         <span className="thing-icon">{r.data.icone || '•'}</span>
                         <div className="thing-info">
                           <strong>{r.data.nome}{r.data.qtd && r.data.qtd > 1 ? <span className="qtd"> ×{r.data.qtd}</span> : null}</strong>
                           {r.data.notas && <p>{r.data.notas}</p>}
                           {!!r.data.tags?.length && <div className="tags">{r.data.tags.map((t) => <span key={t} className="tag">#{t}</span>)}</div>}
                         </div>
-                        <div className="row-actions">
+                        <div className="row-actions no-drag">
                           <IconButton label="Editar / mover" onClick={() => setEditing({ rec: r, recipiente: false })}><IconEdit /></IconButton>
                           <IconButton label="Apagar" onClick={() => apagar(r)}><IconTrash /></IconButton>
                         </div>
@@ -196,6 +224,20 @@ export default function Guardados({ params }: { params: string[] }) {
               )}
             </>
           )}
+        </>
+      )}
+
+      {arrasto && (
+        <>
+          {atual && (
+            <div className="drop-out" {...soltavel(atual.data.paiId ?? 'root')}>
+              ⬆ tirar daqui → {atual.data.paiId ? byId.get(atual.data.paiId)?.data.nome : 'nível principal'}
+            </div>
+          )}
+          <div className={`drag-ghost${arrasto.alvo ? ' ok' : ''}`} style={{ left: arrasto.x, top: arrasto.y }}>
+            {arrasto.label}
+            {arrasto.alvo && <span>→ {arrasto.alvo === 'root' ? 'nível principal' : byId.get(arrasto.alvo)?.data.nome}</span>}
+          </div>
         </>
       )}
 
@@ -216,6 +258,16 @@ export default function Guardados({ params }: { params: string[] }) {
         />
       )}
     </div>
+  )
+}
+
+function Contagem({ coisas, unidades }: { coisas: number; unidades: number }) {
+  if (!coisas) return <span className="box-count">vazio</span>
+  return (
+    <span className="box-count">
+      {coisas} {coisas === 1 ? 'coisa' : 'coisas'}
+      {unidades > 0 && <span className="box-units">{unidades} {unidades === 1 ? 'unidade' : 'unidades'}</span>}
+    </span>
   )
 }
 
