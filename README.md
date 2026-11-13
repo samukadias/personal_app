@@ -7,6 +7,7 @@
 | **Cadê?** | Cataloga onde cada coisa está guardada. Caixas dentro de caixas, sem limite: *Caixa preta grande → Bolsinha verde → Cabo USB-C 15 cm*. A busca mostra o caminho inteiro. |
 | **Sites** | Favoritos por categoria, com busca, filtros e fixados no topo. |
 | **Cofre** | Senhas com criptografia **no navegador** (PBKDF2 + AES-GCM 256). O servidor só guarda texto cifrado; a senha mestra nunca sai do seu aparelho. Gerador de senhas, cópia que se apaga em 30s, tranca sozinho após 5 min. |
+| **Notas** | Anotações em post-its coloridos, com etiquetas, fixadas no topo e listas de tarefas: linha começando com `[ ]` vira item pra marcar direto no cartão. |
 
 Extras: tema claro/escuro, backup/importação em JSON, instalável no celular (PWA), layout pensado para celular.
 

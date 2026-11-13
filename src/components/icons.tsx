@@ -35,4 +35,5 @@ export const IconPin = (p: SVGProps<SVGSVGElement>) => <S {...p}><path d="M9 4h6
 export const IconOut = (p: SVGProps<SVGSVGElement>) => <S {...p}><path d="M14 4.5h5.5V10M19.5 4.5 11 13" /><path d="M18 14v4.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 18.5v-11A1.5 1.5 0 0 1 5.5 6H10" /></S>
 export const IconDice = (p: SVGProps<SVGSVGElement>) => <S {...p}><rect x="4" y="4" width="16" height="16" rx="3.5" /><circle cx="9" cy="9" r=".6" fill="currentColor" /><circle cx="15" cy="15" r=".6" fill="currentColor" /><circle cx="15" cy="9" r=".6" fill="currentColor" /><circle cx="9" cy="15" r=".6" fill="currentColor" /></S>
 export const IconBack = (p: SVGProps<SVGSVGElement>) => <S {...p}><path d="M15 5l-7 7 7 7" /></S>
+export const IconNote = (p: SVGProps<SVGSVGElement>) => <S {...p}><path d="M5 4.5h14v10.5l-5 5H5z" /><path d="M14 20v-5h5M8.5 9h7M8.5 12.5h4" /></S>
 export const IconMove = (p: SVGProps<SVGSVGElement>) => <S {...p}><path d="M5 12h14M14 7l5 5-5 5" /></S>

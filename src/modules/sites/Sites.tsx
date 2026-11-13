@@ -16,7 +16,7 @@ export const normUrl = (u: string) => {
   return /^https?:\/\//i.test(t) ? t : `https://${t.replace(/^[a-z][a-z0-9+.-]*:\/\//i, '')}`
 }
 /** só deixa abrir links http/https (bloqueia javascript:, data: etc.) */
-const linkSeguro = (u: string) => {
+export const linkSeguro = (u: string) => {
   try { const x = new URL(normUrl(u)); return x.protocol === 'https:' || x.protocol === 'http:' ? x.href : undefined } catch { return undefined }
 }
 export const dominio = (u: string) => {

@@ -4,7 +4,8 @@ import { useCollection } from '../lib/useCollection'
 import { go } from '../lib/router'
 import { matches, byName } from '../lib/text'
 import type { Coisa } from '../modules/guardados/Guardados'
-import { normUrl, type Site } from '../modules/sites/Sites'
+import { linkSeguro, type Site } from '../modules/sites/Sites'
+import type { Nota } from '../modules/notas/Notas'
 import { IconSearch } from '../components/icons'
 
 const saudacao = () => {
@@ -30,6 +31,7 @@ function Counter({ kind }: { kind: string }) {
 export default function Home() {
   const coisas = useCollection<Coisa>('coisa')
   const sites = useCollection<Site>('site')
+  const notas = useCollection<Nota>('nota')
   const [q, setQ] = useState('')
   const frase = useMemo(() => FRASES[Math.floor(Math.random() * FRASES.length)], [])
 
@@ -42,6 +44,7 @@ export default function Home() {
   }
   const achadosCoisas = q.trim() ? coisas.items.filter((r) => matches(q, r.data.nome, r.data.notas, r.data.tags)).slice(0, 8) : []
   const achadosSites = q.trim() ? sites.items.filter((r) => matches(q, r.data.nome, r.data.url, r.data.categoria)).slice(0, 6) : []
+  const achadosNotas = q.trim() ? notas.items.filter((r) => matches(q, r.data.titulo, r.data.texto, r.data.tags)).slice(0, 6) : []
   const recentes = [...coisas.items].sort((a, b) => b.updated_at.localeCompare(a.updated_at)).slice(0, 5)
   const fixados = sites.items.filter((r) => r.data.fixado).sort((a, b) => byName(a.data.nome, b.data.nome)).slice(0, 8)
 
@@ -55,7 +58,7 @@ export default function Home() {
 
       <div className="search-big search-home">
         <IconSearch />
-        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Procurar em tudo (coisas e sites)…" aria-label="Busca geral" />
+        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Procurar em tudo (coisas, sites e notas)…" aria-label="Busca geral" />
         {q && <button className="search-clear" onClick={() => setQ('')}>limpar</button>}
       </div>
 
@@ -78,12 +81,25 @@ export default function Home() {
             {achadosSites.length ? (
               <ul className="mini-list">
                 {achadosSites.map((r) => (
-                  <li key={r.id}><a href={normUrl(r.data.url)} target="_blank" rel="noopener noreferrer">
+                  <li key={r.id}><a href={linkSeguro(r.data.url)} target="_blank" rel="noopener noreferrer">
                     <strong>{r.data.nome}</strong><span>{r.data.categoria || 'Sem categoria'}</span>
                   </a></li>
                 ))}
               </ul>
             ) : <p className="muted">Nenhum.</p>}
+          </section>
+          <section>
+            <h2 className="section-title">Notas</h2>
+            {achadosNotas.length ? (
+              <ul className="mini-list">
+                {achadosNotas.map((r) => (
+                  <li key={r.id}><button onClick={() => go('notas')}>
+                    <strong>📝 {r.data.titulo || r.data.texto.split('\n')[0].replace(/^\s*[-*]?\s*\[( |x)\]\s?/i, '').slice(0, 60) || 'sem título'}</strong>
+                    <span>{r.data.tags?.length ? r.data.tags.map((t) => `#${t}`).join(' ') : 'nota'}</span>
+                  </button></li>
+                ))}
+              </ul>
+            ) : <p className="muted">Nenhuma.</p>}
           </section>
           <p className="muted small">O cofre não entra na busca geral — senha a gente procura com ele aberto.</p>
         </div>
@@ -121,7 +137,7 @@ export default function Home() {
               <h2 className="section-title">Sites fixados</h2>
               {fixados.length ? (
                 <div className="pin-cloud">
-                  {fixados.map((r) => <a key={r.id} className="pill" href={normUrl(r.data.url)} target="_blank" rel="noopener noreferrer">{r.data.nome} ↗</a>)}
+                  {fixados.map((r) => <a key={r.id} className="pill" href={linkSeguro(r.data.url)} target="_blank" rel="noopener noreferrer">{r.data.nome} ↗</a>)}
                 </div>
               ) : <p className="muted">Fixe sites com o 📌 pra eles aparecerem aqui.</p>}
             </section>
