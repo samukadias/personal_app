@@ -18,7 +18,7 @@ export default function Ajustes() {
     const blob = new Blob([JSON.stringify({ app: 'tralha', versao: 1, exportadoEm: new Date().toISOString(), registros: all }, null, 2)], { type: 'application/json' })
     const a = document.createElement('a')
     a.href = URL.createObjectURL(blob)
-    a.download = `tralha-backup-${new Date().toISOString().slice(0, 10)}.json`
+    a.download = `samuapp-backup-${new Date().toISOString().slice(0, 10)}.json`
     a.click()
     URL.revokeObjectURL(a.href)
     toast(`Backup com ${all.length} registros baixado ✔`)
@@ -27,7 +27,7 @@ export default function Ajustes() {
     try {
       const json = JSON.parse(await f.text())
       const regs: Rec[] = json.registros
-      if (!Array.isArray(regs)) throw new Error('Arquivo não parece um backup do tralha.')
+      if (!Array.isArray(regs)) throw new Error('Arquivo não parece um backup do SamuAPP.')
       if (!(await ask(`Importar ${regs.length} registros? Itens com o mesmo id serão sobrescritos.`, 'Importar'))) return
       const temCofre = regs.some((r) => r.kind === 'cofre_meta')
       if (temCofre && (await store.list('cofre_meta')).length && !(await ask('O backup tem um cofre e você já tem um aqui. A senha mestra do backup vai substituir a atual. Continuar?', 'Continuar'))) return

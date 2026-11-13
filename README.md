@@ -1,4 +1,4 @@
-# tralha.
+# SamuAPP
 
 > o canivete suíço da sua vida — um app pessoal, modular e seu.
 

@@ -15,10 +15,10 @@ export default function App() {
 
   useEffect(() => { window.scrollTo(0, 0) }, [section])
   useEffect(() => {
-    document.title = mod ? `${mod.name} · tralha` : section === 'ajustes' ? 'Ajustes · tralha' : 'tralha'
+    document.title = mod ? `${mod.name} · SamuAPP` : section === 'ajustes' ? 'Ajustes · SamuAPP' : 'SamuAPP'
   }, [mod, section])
 
-  if (!ready) return <div className="boot"><span className="logo">tralha<i>.</i></span></div>
+  if (!ready) return <div className="boot"><span className="logo">Samu<i>APP</i></span></div>
   if (isCloud && !session) return <Login />
 
   const nav = [
@@ -31,7 +31,7 @@ export default function App() {
   return (
     <div className="shell">
       <aside className="sidebar">
-        <button className="logo" onClick={() => go()}>tralha<i>.</i></button>
+        <button className="logo" onClick={() => go()}>Samu<i>APP</i></button>
         <p className="logo-sub">o canivete suíço<br />da sua vida</p>
         <nav className="nav">
           {nav.map((n) => (

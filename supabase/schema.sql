@@ -1,4 +1,4 @@
--- tralha. — rode isto UMA vez no SQL Editor do Supabase.
+-- SamuAPP — rode isto UMA vez no SQL Editor do Supabase.
 -- Uma tabela genérica serve todos os módulos (atuais e futuros).
 
 create table if not exists public.records (

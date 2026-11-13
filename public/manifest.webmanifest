@@ -1,6 +1,6 @@
 {
-  "name": "tralha.",
-  "short_name": "tralha",
+  "name": "SamuAPP",
+  "short_name": "SamuAPP",
   "description": "Coisas guardadas, sites favoritos e cofre de senhas.",
   "start_url": "./",
   "scope": "./",

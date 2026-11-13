@@ -23,7 +23,7 @@ export default function Login() {
   return (
     <div className="login">
       <div className="login-card">
-        <span className="logo big">tralha<i>.</i></span>
+        <span className="logo big">Samu<i>APP</i></span>
         <p className="lede">Suas coisas, seus links e suas senhas.<br />Num lugar só, e só seu.</p>
         <form className="form" onSubmit={submit}>
           <Field label="E-mail"><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" required /></Field>
